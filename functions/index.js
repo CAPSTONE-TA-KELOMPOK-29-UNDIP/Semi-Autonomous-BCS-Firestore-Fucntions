@@ -19,16 +19,25 @@ exports.processSensorData = functions.database
         const lpgConcentrationSnapshot = await lpgConcentrationRef.once(
           "value"
         );
-        const lpgConcentrationValue = lpgConcentrationSnapshot.val();
+        let lpgConcentrationValue = lpgConcentrationSnapshot.val();
 
-        // Tentukan status berdasarkan nilai dari newStatus
+        // Tentukan status dan modifikasi nilai jika diperlukan
         let status;
         if (newStatus === "bahaya") {
           status = "KONDISI BAHAYA";
+          if (lpgConcentrationValue === null || lpgConcentrationValue < 700) {
+            lpgConcentrationValue = 700;
+          }
         } else if (newStatus === "siaga") {
           status = "KONDISI SIAGA";
+          if (lpgConcentrationValue === null || lpgConcentrationValue < 500) {
+            lpgConcentrationValue = 500;
+          }
         } else if (newStatus === "aman") {
           status = "KONDISI AMAN";
+          if (lpgConcentrationValue === null || lpgConcentrationValue >= 499) {
+            lpgConcentrationValue = 499;
+          }
         } else {
           status = "STATUS TIDAK DITEMUKAN";
         }
